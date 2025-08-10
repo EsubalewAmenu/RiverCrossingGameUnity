@@ -399,15 +399,20 @@ public class Level2RiverController : MonoBehaviour
             GoButton.interactable = true;
         }
 
-        if (isTimerRunning && timeRemaining > 0)
-
+        if (isTimerRunning)
         {
             timeRemaining -= Time.deltaTime;
-            UpdateTimerUI();
-        }
-        else if (timeRemaining <= 0)
-        {
-            isTimerRunning = false;
+
+            if (timeRemaining <= 0)
+            {
+                timeRemaining = 0; // clamp to zero
+                isTimerRunning = false;
+                UpdateTimerUI();
+            }
+            else
+            {
+                UpdateTimerUI();
+            }
         }
 
     }
