@@ -16,9 +16,9 @@ public class Level1RiverController : MonoBehaviour
 
     // Buttons
 
-    public Button SheepButton;
-    public Button WolfButton;
-    public Button CabbageButton;
+    // public Button SheepButton;
+    // public Button WolfButton;
+    // public Button CabbageButton;
     public Button GoButton;
     public Button CabbagePlayAgain;
     public Button CabbageMainMenuButton;
@@ -76,12 +76,10 @@ public class Level1RiverController : MonoBehaviour
     public float timeRemaining;
     public bool isTimerRunning = true;
 
+    private bool isBoatOccupied = false;
 
     void Start()
     {
-        SheepButton.onClick.AddListener(MoveSheep);
-        WolfButton.onClick.AddListener(MoveWolf);
-        CabbageButton.onClick.AddListener(MoveCabbage);
         GoButton.onClick.AddListener(MoveBoat);
         CabbagePlayAgain.onClick.AddListener(ResetGame);
         CabbageMainMenuButton.onClick.AddListener(MainMenu);
@@ -117,6 +115,10 @@ public class Level1RiverController : MonoBehaviour
     {
         JumpSound.Play();
 
+        // If boat already has something and it's not the Sheep, don't let Sheep move
+        if (isBoatOccupied && Sheep.transform.position != BoatCarryRightSidePosition && Sheep.transform.position != BoatCarryLeftSidePosition)
+            return;
+
         if (Sheep.transform.position == SheepRightSidePosition && Boat.transform.position == BoatRightSidePosition)
             Sheep.transform.position = BoatCarryRightSidePosition;
         else if (Sheep.transform.position == BoatCarryRightSidePosition && Boat.transform.position == BoatRightSidePosition)
@@ -126,25 +128,20 @@ public class Level1RiverController : MonoBehaviour
         else if (Sheep.transform.position == SheepLeftSidePosition && Boat.transform.position == BoatLeftSidePosition)
             Sheep.transform.position = BoatCarryLeftSidePosition;
 
-        // On Boat Condition 
+        // Update boat occupancy
+        isBoatOccupied = 
+            Sheep.transform.position == BoatCarryRightSidePosition || Sheep.transform.position == BoatCarryLeftSidePosition;
 
-        if (Sheep.transform.position == BoatCarryRightSidePosition || Sheep.transform.position==BoatCarryLeftSidePosition)
-        {
-            WolfButton.interactable = false;
-            CabbageButton.interactable = false;
-        }
-
-        if (Sheep.transform.position == SheepRightSidePosition || Sheep.transform.position == SheepLeftSidePosition)
-        {
-            WolfButton.interactable = true;
-            CabbageButton.interactable = true;
-        }
 
     }
 
     void MoveWolf()
     {
         JumpSound.Play(); 
+
+        // If boat already has something and it's not the wolf, don't let wolf move
+        if (isBoatOccupied && Wolf.transform.position != BoatCarryRightSidePosition && Wolf.transform.position != BoatCarryLeftSidePosition)
+            return;
 
         if (Wolf.transform.position == WolfRightSidePosition && Boat.transform.position == BoatRightSidePosition)
             Wolf.transform.position = BoatCarryRightSidePosition;
@@ -155,25 +152,19 @@ public class Level1RiverController : MonoBehaviour
         else if (Wolf.transform.position == WolfLeftSidePosition && Boat.transform.position == BoatLeftSidePosition)
             Wolf.transform.position = BoatCarryLeftSidePosition;
 
-        // On Boat Condition 
-
-        if (Wolf.transform.position == BoatCarryRightSidePosition || Wolf.transform.position == BoatCarryLeftSidePosition)
-        {
-            SheepButton.interactable = false;
-            CabbageButton.interactable = false;
-        }
-
-        if (Wolf.transform.position == WolfRightSidePosition || Wolf.transform.position == WolfLeftSidePosition)
-        {
-            SheepButton.interactable = true;
-            CabbageButton.interactable = true;
-        }
+        // Update boat occupancy
+        isBoatOccupied = 
+            Wolf.transform.position == BoatCarryRightSidePosition || Wolf.transform.position == BoatCarryLeftSidePosition;
 
     }
 
      void MoveCabbage()
     {
         JumpSound.Play();
+
+        // If boat already has something and it's not the Cabbage, don't let Cabbage move
+        if (isBoatOccupied && Cabbage.transform.position != BoatCarryRightSidePosition && Cabbage.transform.position != BoatCarryLeftSidePosition)
+            return;
 
         if (Cabbage.transform.position == CabbageRightSidePosition && Boat.transform.position == BoatRightSidePosition)
             Cabbage.transform.position = BoatCarryRightSidePosition;
@@ -184,19 +175,9 @@ public class Level1RiverController : MonoBehaviour
         else if (Cabbage.transform.position == CabbageLeftSidePosition && Boat.transform.position == BoatLeftSidePosition)
             Cabbage.transform.position = BoatCarryLeftSidePosition;
 
-        // On Boat Condition 
-
-        if (Cabbage.transform.position == BoatCarryRightSidePosition || Cabbage.transform.position == BoatCarryLeftSidePosition)
-        {
-            WolfButton.interactable = false;
-            SheepButton.interactable = false;
-        }
-
-        if (Cabbage.transform.position == CabbageRightSidePosition || Cabbage.transform.position == CabbageLeftSidePosition)
-        {
-            WolfButton.interactable = true;
-            SheepButton.interactable = true;
-        }
+        // Update boat occupancy
+        isBoatOccupied = 
+            Cabbage.transform.position == BoatCarryRightSidePosition || Cabbage.transform.position == BoatCarryLeftSidePosition;
 
     }
     void MoveBoat()
@@ -328,6 +309,31 @@ public class Level1RiverController : MonoBehaviour
         {
             isTimerRunning = false;
         }
+
+
+    // Detect mouse clicks
+    if (Input.GetMouseButtonDown(0)) // 0 = left click / tap
+    {
+        Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
+
+        if (hit.collider != null)
+        {
+            if (hit.collider.gameObject == Sheep)
+            {
+                MoveSheep();
+            }
+            else if (hit.collider.gameObject == Wolf)
+            {
+                MoveWolf();
+            }
+            else if (hit.collider.gameObject == Cabbage)
+            {
+                MoveCabbage();
+            }
+        }
+    }
+
 
     }
 
