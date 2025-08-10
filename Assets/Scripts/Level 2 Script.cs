@@ -22,10 +22,6 @@ public class Level2RiverController : MonoBehaviour
 
     // Buttons
 
-    public Button DadButton;
-    public Button MomButton;
-    public Button BoyButton;
-    public Button GirlButton;
     public Button GoButton;
     public Button WinPlayAgain;
     public Button WinMainMenuButton;
@@ -88,10 +84,6 @@ public class Level2RiverController : MonoBehaviour
 
     void Start()
     {
-        DadButton.onClick.AddListener(MoveDad);
-        MomButton.onClick.AddListener(MoveMom);
-        BoyButton.onClick.AddListener(MoveBoy);
-        GirlButton.onClick.AddListener(MoveGirl);
         GoButton.onClick.AddListener(MoveBoat);
         WinPlayAgain.onClick.AddListener(ResetGame);
         WinMainMenuButton.onClick.AddListener(MainMenu);
@@ -124,11 +116,11 @@ public class Level2RiverController : MonoBehaviour
 
         if (Dad.transform.position == DadRightSidePosition && Boat.transform.position == BoatRightSidePosition)
         {
+            if (!CanBoard('D'))
+                return;  // Boat full or invalid, ignore input
+
             Dad.transform.position = BoatCarryBigRightSidePosition;
             ONBoat.Add('D');
-            MomButton.interactable = false;
-            BoyButton.interactable = false;
-            GirlButton.interactable = false;
 
         }
 
@@ -136,27 +128,21 @@ public class Level2RiverController : MonoBehaviour
         {
             Dad.transform.position = DadRightSidePosition;
             ONBoat.Remove('D');
-            MomButton.interactable = true;
-            BoyButton.interactable = true;
-            GirlButton.interactable = true;
         }
 
         else if (Dad.transform.position == BoatCarryBigLeftSidePosition && Boat.transform.position == BoatLeftSidePosition)
         {
             Dad.transform.position = DadLeftSidePosition;
             ONBoat.Remove('D');
-            MomButton.interactable = true;
-            BoyButton.interactable = true;
-            GirlButton.interactable = true;
         }
 
         else if (Dad.transform.position == DadLeftSidePosition && Boat.transform.position == BoatLeftSidePosition)
         {
+            if (!CanBoard('D'))
+                return;  // Boat full or invalid, ignore input
+
             Dad.transform.position = BoatCarryBigLeftSidePosition;
             ONBoat.Add('D');
-            MomButton.interactable = false;
-            BoyButton.interactable = false;
-            GirlButton.interactable = false;
 
         }
     }
@@ -167,20 +153,18 @@ public class Level2RiverController : MonoBehaviour
 
         if (Mom.transform.position == MomRightSidePosition && Boat.transform.position == BoatRightSidePosition)
         {
+            
+            if (!CanBoard('M'))
+                return;  // Boat full or invalid, ignore input
+
             Mom.transform.position = BoatCarryBigRightSidePosition;
             ONBoat.Add('M');
-            DadButton.interactable = false;
-            BoyButton.interactable = false;
-            GirlButton.interactable = false;
         }
 
         else if (Mom.transform.position == BoatCarryBigRightSidePosition && Boat.transform.position == BoatRightSidePosition)
         {
             Mom.transform.position = MomRightSidePosition;
             ONBoat.Remove('M');
-            DadButton.interactable = true;
-            BoyButton.interactable = true;
-            GirlButton.interactable = true;
         }
 
         else if (Mom.transform.position == BoatCarryBigLeftSidePosition && Boat.transform.position == BoatLeftSidePosition)
@@ -188,18 +172,15 @@ public class Level2RiverController : MonoBehaviour
          
             Mom.transform.position = MomLeftSidePosition;
             ONBoat.Remove('M');
-            DadButton.interactable = true;
-            BoyButton.interactable = true;
-            GirlButton.interactable = true;
         }
 
         else if (Mom.transform.position == MomLeftSidePosition && Boat.transform.position == BoatLeftSidePosition)
         {
+            if (!CanBoard('M'))
+                return;  // Boat full or invalid, ignore input
+
             Mom.transform.position = BoatCarryBigLeftSidePosition;
             ONBoat.Add('M');
-            DadButton.interactable = false;
-            BoyButton.interactable = false;
-            GirlButton.interactable = false;
         }
         
     }
@@ -210,44 +191,30 @@ public class Level2RiverController : MonoBehaviour
 
         if (Boy.transform.position == BoyRightSidePosition && Boat.transform.position == BoatRightSidePosition)
         {
+            if (!CanBoard('B'))
+                return;  // Boat full or invalid, ignore input
+
             Boy.transform.position = BoatCarryBoyRightSidePosition;
             ONBoat.Add('B');
-            DadButton.interactable = false;
-            MomButton.interactable = false;
         }
         else if (Boy.transform.position == BoatCarryBoyRightSidePosition && Boat.transform.position == BoatRightSidePosition)
         {
             ONBoat.Remove('B');
             Boy.transform.position = BoyRightSidePosition;
 
-            if (Girl.transform.position == GirlRightSidePosition)
-            {
-                DadButton.interactable = true;
-                MomButton.interactable = true;
-            }
-            if (Girl.transform.position == GirlLeftSidePosition)
-            {
-                DadButton.interactable = true;
-                MomButton.interactable = true;
-            }
-
         }
         else if (Boy.transform.position == BoatCarryBoyLeftSidePosition && Boat.transform.position == BoatLeftSidePosition)
         {
             Boy.transform.position = BoyLeftSidePosition;
             ONBoat.Remove('B');
-            if (Girl.transform.position == GirlLeftSidePosition)
-            {
-                DadButton.interactable = true;
-                MomButton.interactable = true;
-            }
         }
         else if (Boy.transform.position == BoyLeftSidePosition && Boat.transform.position == BoatLeftSidePosition)
         {
+            if (!CanBoard('B'))
+                return;  // Boat full or invalid, ignore input
+
             ONBoat.Add('B');
             Boy.transform.position = BoatCarryBoyLeftSidePosition;
-            DadButton.interactable = false;
-            MomButton.interactable = false;
         }
         }
 
@@ -257,10 +224,11 @@ public class Level2RiverController : MonoBehaviour
 
         if (Girl.transform.position == GirlRightSidePosition && Boat.transform.position == BoatRightSidePosition)
         {
+            if (!CanBoard('G'))
+                return;  // Boat full or invalid, ignore input
+
             ONBoat.Add('G');
             Girl.transform.position = BoatCarryGirlRightSidePosition;
-            DadButton.interactable = false;
-            MomButton.interactable = false;
 
         }
         else if (Girl.transform.position == BoatCarryGirlRightSidePosition && Boat.transform.position == BoatRightSidePosition)
@@ -268,33 +236,19 @@ public class Level2RiverController : MonoBehaviour
             ONBoat.Remove('G');
             Girl.transform.position = GirlRightSidePosition;
 
-            if (Boy.transform.position == BoyRightSidePosition)
-            {
-                DadButton.interactable = true;
-                MomButton.interactable = true;
-            }
-            if (Boy.transform.position == BoyLeftSidePosition)
-            {
-                DadButton.interactable = true;
-                MomButton.interactable = true;
-            }
         }
         else if (Girl.transform.position == BoatCarryGirlLeftSidePosition && Boat.transform.position == BoatLeftSidePosition)
         {
             ONBoat.Remove('G');
             Girl.transform.position = GirlLeftSidePosition;
-            if (Boy.transform.position == BoyLeftSidePosition)
-            {
-                DadButton.interactable = true;
-                MomButton.interactable = true;
-            }
         }
         else if (Girl.transform.position == GirlLeftSidePosition && Boat.transform.position == BoatLeftSidePosition)
         {
+            if (!CanBoard('G'))
+                return;  // Boat full or invalid, ignore input
+
             ONBoat.Add('G');
             Girl.transform.position = BoatCarryGirlLeftSidePosition;
-            DadButton.interactable = false;
-            MomButton.interactable = false;
         }
         }
 
@@ -377,6 +331,23 @@ public class Level2RiverController : MonoBehaviour
         ButtonClick.Play();
     }
 
+    bool CanBoard(char character)
+    {
+        int bigCount = ONBoat.Count(c => c == 'D' || c == 'M');  // Big humans
+        int smallCount = ONBoat.Count(c => c == 'B' || c == 'G'); // Small humans
+
+        if (character == 'D' || character == 'M')
+        {
+            // Big human can board only if boat is empty
+            return ONBoat.Count == 0;
+        }
+        else // small human
+        {
+            // Small human can board only if there is room (max 2 smalls) and no big humans on board
+            return bigCount == 0 && smallCount < 2;
+        }
+    }
+
     void Update()
     {
         if (Boy.transform.position == BoyLeftSidePosition && Girl.transform.position == GirlLeftSidePosition && Dad.transform.position == DadLeftSidePosition && Mom.transform.position == MomLeftSidePosition)
@@ -415,6 +386,32 @@ public class Level2RiverController : MonoBehaviour
             }
         }
 
+        // Detect mouse clicks
+        if (Input.GetMouseButtonDown(0)) // 0 = left click / tap
+        {
+            Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
+
+            if (hit.collider != null)
+            {
+                if (hit.collider.gameObject == Dad)
+                {
+                    MoveDad();
+                }
+                else if (hit.collider.gameObject == Mom)
+                {
+                    MoveMom();
+                }
+                else if (hit.collider.gameObject == Boy)
+                {
+                    MoveBoy();
+                }
+                else if (hit.collider.gameObject == Girl)
+                {
+                    MoveGirl();
+                }
+            }
+        }
     }
 
     public void Soundon()
