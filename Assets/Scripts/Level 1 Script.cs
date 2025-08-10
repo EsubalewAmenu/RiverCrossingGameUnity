@@ -16,9 +16,6 @@ public class Level1RiverController : MonoBehaviour
 
     // Buttons
 
-    // public Button SheepButton;
-    // public Button WolfButton;
-    // public Button CabbageButton;
     public Button GoButton;
     public Button CabbagePlayAgain;
     public Button CabbageMainMenuButton;
@@ -300,14 +297,20 @@ public class Level1RiverController : MonoBehaviour
             StopTimer();
             CalculateStars();
         }
-        if (isTimerRunning && timeRemaining > 0)
+        if (isTimerRunning)
         {
             timeRemaining -= Time.deltaTime;
-            UpdateTimerUI();
-        }
-        else if (timeRemaining <= 0)
-        {
-            isTimerRunning = false;
+
+            if (timeRemaining <= 0)
+            {
+                timeRemaining = 0; // clamp to zero
+                isTimerRunning = false;
+                UpdateTimerUI();
+            }
+            else
+            {
+                UpdateTimerUI();
+            }
         }
 
 
