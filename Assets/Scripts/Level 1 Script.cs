@@ -58,9 +58,9 @@ public class Level1RiverController : MonoBehaviour
     [SerializeField] AudioSource Music;
     [SerializeField] AudioSource ButtonClick;
     [SerializeField] AudioSource JumpSound;
-    
+
     //Timer And Score
-    
+
     public TextMeshProUGUI timerText;
     public GameObject nostar1;
     public GameObject nostar2;
@@ -96,19 +96,19 @@ public class Level1RiverController : MonoBehaviour
         UpdateTimerUI();
     }
 
-  public void UpdateTimerUI()
-  {
-    int minutes = Mathf.FloorToInt(timeRemaining / 60);
+    public void UpdateTimerUI()
+    {
+        int minutes = Mathf.FloorToInt(timeRemaining / 60);
         int seconds = Mathf.FloorToInt(timeRemaining % 60);
         timerText.text = $"Time: {minutes:00}:{seconds:00}";
-  }
+    }
 
     public void StopTimer()
     {
         isTimerRunning = false;
     }
 
-  void MoveSheep()
+    void MoveSheep()
     {
         JumpSound.Play();
 
@@ -126,7 +126,7 @@ public class Level1RiverController : MonoBehaviour
             Sheep.transform.position = BoatCarryLeftSidePosition;
 
         // Update boat occupancy
-        isBoatOccupied = 
+        isBoatOccupied =
             Sheep.transform.position == BoatCarryRightSidePosition || Sheep.transform.position == BoatCarryLeftSidePosition;
 
 
@@ -134,7 +134,7 @@ public class Level1RiverController : MonoBehaviour
 
     void MoveWolf()
     {
-        JumpSound.Play(); 
+        JumpSound.Play();
 
         // If boat already has something and it's not the wolf, don't let wolf move
         if (isBoatOccupied && Wolf.transform.position != BoatCarryRightSidePosition && Wolf.transform.position != BoatCarryLeftSidePosition)
@@ -150,12 +150,12 @@ public class Level1RiverController : MonoBehaviour
             Wolf.transform.position = BoatCarryLeftSidePosition;
 
         // Update boat occupancy
-        isBoatOccupied = 
+        isBoatOccupied =
             Wolf.transform.position == BoatCarryRightSidePosition || Wolf.transform.position == BoatCarryLeftSidePosition;
 
     }
 
-     void MoveCabbage()
+    void MoveCabbage()
     {
         JumpSound.Play();
 
@@ -173,7 +173,7 @@ public class Level1RiverController : MonoBehaviour
             Cabbage.transform.position = BoatCarryLeftSidePosition;
 
         // Update boat occupancy
-        isBoatOccupied = 
+        isBoatOccupied =
             Cabbage.transform.position == BoatCarryRightSidePosition || Cabbage.transform.position == BoatCarryLeftSidePosition;
 
     }
@@ -314,28 +314,28 @@ public class Level1RiverController : MonoBehaviour
         }
 
 
-    // Detect mouse clicks
-    if (Input.GetMouseButtonDown(0)) // 0 = left click / tap
-    {
-        Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
-
-        if (hit.collider != null)
+        // Detect mouse clicks
+        if (Input.GetMouseButtonDown(0)) // 0 = left click / tap
         {
-            if (hit.collider.gameObject == Sheep)
+            Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
+
+            if (hit.collider != null)
             {
-                MoveSheep();
-            }
-            else if (hit.collider.gameObject == Wolf)
-            {
-                MoveWolf();
-            }
-            else if (hit.collider.gameObject == Cabbage)
-            {
-                MoveCabbage();
+                if (hit.collider.gameObject == Sheep)
+                {
+                    MoveSheep();
+                }
+                else if (hit.collider.gameObject == Wolf)
+                {
+                    MoveWolf();
+                }
+                else if (hit.collider.gameObject == Cabbage)
+                {
+                    MoveCabbage();
+                }
             }
         }
-    }
 
 
     }
@@ -360,35 +360,35 @@ public class Level1RiverController : MonoBehaviour
         ButtonClick.Play();
     }
     void CalculateStars()
-{
-    // Define thresholds for stars
-    if (timeRemaining >= levelTime * 0.7f) // 70% or more time remaining
     {
-        star1.SetActive(true);
-        star2.SetActive(true);
-        star3.SetActive(true);
-        nostar1.SetActive(false);
-        nostar2.SetActive(false);
-        nostar3.SetActive(false);
-        starScore = 3;
-    }
-    else if (timeRemaining >= levelTime * 0.4f) // Between 40% and 70% time remaining
-    {
-        star1.SetActive(true);
-        star2.SetActive(true);
-        star3.SetActive(false);
-        nostar1.SetActive(false);
-        nostar2.SetActive(false);
-        starScore = 2;
-    }
-    else // Less than 40% time remaining
-    {
-        star1.SetActive(true);
-        star2.SetActive(false);
-        star3.SetActive(false);
-        nostar1.SetActive(false);
+        // Define thresholds for stars
+        if (timeRemaining >= levelTime * 0.7f) // 70% or more time remaining
+        {
+            star1.SetActive(true);
+            star2.SetActive(true);
+            star3.SetActive(true);
+            nostar1.SetActive(false);
+            nostar2.SetActive(false);
+            nostar3.SetActive(false);
+            starScore = 3;
+        }
+        else if (timeRemaining >= levelTime * 0.4f) // Between 40% and 70% time remaining
+        {
+            star1.SetActive(true);
+            star2.SetActive(true);
+            star3.SetActive(false);
+            nostar1.SetActive(false);
+            nostar2.SetActive(false);
+            starScore = 2;
+        }
+        else // Less than 40% time remaining
+        {
+            star1.SetActive(true);
+            star2.SetActive(false);
+            star3.SetActive(false);
+            nostar1.SetActive(false);
 
-        starScore = 1;
+            starScore = 1;
+        }
     }
-}
 }
