@@ -82,6 +82,7 @@ public class Level2RiverController : MonoBehaviour
     public float levelTime = 60f;
     public float timeRemaining;
     public bool isTimerRunning = true;
+    private bool hasCompletedLevel = false;
 
     void Start()
     {
@@ -361,6 +362,7 @@ public class Level2RiverController : MonoBehaviour
         if (Boy.transform.position == BoyLeftSidePosition && Girl.transform.position == GirlLeftSidePosition && Dad.transform.position == DadLeftSidePosition && Mom.transform.position == MomLeftSidePosition)
         
         {
+            CompleteCurrentLevel();
             WinState.SetActive(true);
             StopTimer();
             CalculateStars();
@@ -420,6 +422,14 @@ public class Level2RiverController : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void CompleteCurrentLevel()
+    {
+        if (hasCompletedLevel) return;
+
+        hasCompletedLevel = true;
+        LevelProgression.CompleteLevel(2);
     }
 
     public void Soundon()

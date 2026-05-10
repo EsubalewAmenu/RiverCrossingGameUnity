@@ -74,6 +74,7 @@ public class Level1RiverController : MonoBehaviour
     public bool isTimerRunning = true;
 
     private bool isBoatOccupied = false;
+    private bool hasCompletedLevel = false;
 
     void Start()
     {
@@ -293,6 +294,7 @@ public class Level1RiverController : MonoBehaviour
 
         if (Sheep.transform.position == SheepLeftSidePosition && Wolf.transform.position == WolfLeftSidePosition && Cabbage.transform.position == CabbageLeftSidePosition)
         {
+            CompleteCurrentLevel();
             WinState.SetActive(true);
             StopTimer();
             CalculateStars();
@@ -338,6 +340,14 @@ public class Level1RiverController : MonoBehaviour
         }
 
 
+    }
+
+    private void CompleteCurrentLevel()
+    {
+        if (hasCompletedLevel) return;
+
+        hasCompletedLevel = true;
+        LevelProgression.CompleteLevel(1);
     }
 
     public void Soundon()

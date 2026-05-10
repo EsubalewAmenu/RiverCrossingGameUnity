@@ -77,6 +77,7 @@ public class Level2RiverController3D : MonoBehaviour
 
     private bool isBoatMoving = false;
     private bool isBoatOnRightSide = true;
+    private bool hasCompletedLevel = false;
 
     void Start()
     {
@@ -302,9 +303,18 @@ public class Level2RiverController3D : MonoBehaviour
 
         if (charactersOnLeft == 4)
         {
+            CompleteCurrentLevel();
             WinState.SetActive(true);
             CalculateStars();
         }
+    }
+
+    private void CompleteCurrentLevel()
+    {
+        if (hasCompletedLevel) return;
+
+        hasCompletedLevel = true;
+        LevelProgression.CompleteLevel(2);
     }
 
     void Update()
