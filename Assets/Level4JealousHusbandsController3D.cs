@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using UnityEngine.Events;
 
 public class Level4JealousHusbandsController3D : MonoBehaviour
 {
@@ -83,7 +84,7 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
     [SerializeField] AudioSource ErrorSound;
 
     // Game Variables
-    public List<char> ONBoat = new List<char>();
+    public List<string> ONBoat = new List<string>();
     public Slider progressSlider;
     public GameObject[] stars;
     public GameObject[] nostars;
@@ -93,24 +94,26 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
 
     private bool isBoatMoving = false;
     private bool isBoatOnRightSide = true;
+    private bool isGameOver = false;
 
     // Character codes: H1=Husband1, W1=Wife1, H2=Husband2, W2=Wife2, H3=Husband3, W3=Wife3
 
     void Start()
     {
         SetInitialPositions();
+        ResolveStartLevelButton();
 
         // Button listeners
-        GoButton.onClick.AddListener(MoveBoat);
-        WinPlayAgain.onClick.AddListener(ResetGame);
-        WinMainMenuButton.onClick.AddListener(MainMenu);
-        PauseMainMenuButton.onClick.AddListener(MainMenu);
-        PauseRestart.onClick.AddListener(ResetGame);
-        SoundOn.onClick.AddListener(() => Music.Play());
-        SoundOff.onClick.AddListener(() => Music.Stop());
-        PauseContinue.onClick.AddListener(() => Pause.SetActive(false));
-        PauseButton.onClick.AddListener(() => Pause.SetActive(true));
-        StartLevel4Button.onClick.AddListener(() => HowToPlay.SetActive(false));
+        AddButtonListener(GoButton, MoveBoat);
+        AddButtonListener(WinPlayAgain, ResetGame);
+        AddButtonListener(WinMainMenuButton, MainMenu);
+        AddButtonListener(PauseMainMenuButton, MainMenu);
+        AddButtonListener(PauseRestart, ResetGame);
+        AddButtonListener(SoundOn, () => Music.Play());
+        AddButtonListener(SoundOff, () => Music.Stop());
+        AddButtonListener(PauseContinue, () => Pause.SetActive(false));
+        AddButtonListener(PauseButton, () => Pause.SetActive(true));
+        AddButtonListener(StartLevel4Button, () => HowToPlay.SetActive(false));
 
         if (GameOverPanel != null) GameOverPanel.SetActive(false);
 
@@ -135,7 +138,29 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
 
         ONBoat.Clear();
         isBoatOnRightSide = true;
+        isGameOver = false;
         moveCount = 0;
+    }
+
+    void AddButtonListener(Button button, UnityAction action)
+    {
+        if (button != null)
+            button.onClick.AddListener(action);
+    }
+
+    void ResolveStartLevelButton()
+    {
+        if (StartLevel4Button != null || HowToPlay == null) return;
+
+        foreach (Button button in HowToPlay.GetComponentsInChildren<Button>(true))
+        {
+            string buttonName = button.gameObject.name.ToLowerInvariant();
+            if (buttonName.Contains("start") || buttonName.Contains("continue"))
+            {
+                StartLevel4Button = button;
+                return;
+            }
+        }
     }
 
     enum CharacterState { Left, Boat, Right }
@@ -191,9 +216,9 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
 
     void MovePerson(string person)
     {
-        if (isBoatMoving) return;
+        if (isBoatMoving || isGameOver) return;
 
-        JumpSound.Play();
+        if (JumpSound != null) JumpSound.Play();
         CharacterState currentState = GetCharacterCurrentState(person);
 
         switch (currentState)
@@ -202,7 +227,7 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
                 if (CanBoard(person))
                 {
                     SetCharacterState(person, CharacterState.Boat);
-                    ONBoat.Add(person[0]); // Store first character (H or W)
+                    ONBoat.Add(person);
                 }
                 else
                 {
@@ -212,14 +237,14 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
 
             case CharacterState.Boat when isBoatOnRightSide:
                 SetCharacterState(person, CharacterState.Right);
-                ONBoat.Remove(person[0]);
+                ONBoat.Remove(person);
                 break;
 
             case CharacterState.Left when !isBoatOnRightSide:
                 if (CanBoard(person))
                 {
                     SetCharacterState(person, CharacterState.Boat);
-                    ONBoat.Add(person[0]);
+                    ONBoat.Add(person);
                 }
                 else
                 {
@@ -229,26 +254,28 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
 
             case CharacterState.Boat when !isBoatOnRightSide:
                 SetCharacterState(person, CharacterState.Left);
-                ONBoat.Remove(person[0]);
+                ONBoat.Remove(person);
                 break;
         }
 
         UpdateProgress();
+
+        if (!isGameOver && HasAnyBankViolation())
+            TriggerRuleViolation("Invalid move! A wife is left with another husband!");
     }
 
     void MoveBoat()
     {
-        if (isBoatMoving || ONBoat.Count == 0) return;
+        if (isBoatMoving || isGameOver || ONBoat.Count == 0) return;
 
         // Check if this move would cause a violation BEFORE moving
         if (WouldCauseViolation())
         {
-            ShowError("Invalid move! A wife would be left with another husband!");
-            if (ErrorSound != null) ErrorSound.Play();
+            TriggerRuleViolation("Invalid move! A wife would be left with another husband!");
             return;
         }
 
-        JumpSound.Play();
+        if (JumpSound != null) JumpSound.Play();
         if (BoatMoveSound != null) BoatMoveSound.Play();
         moveCount++;
         UpdateMoveCounter();
@@ -269,11 +296,11 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
             CharacterState state = GetCharacterCurrentState(person);
 
             // Person is on current bank but NOT on boat
-            if (isBoatOnRightSide && state == CharacterState.Right && !ONBoat.Contains(person[0]))
+            if (isBoatOnRightSide && state == CharacterState.Right && !ONBoat.Contains(person))
             {
                 remainingOnCurrentBank.Add(person);
             }
-            else if (!isBoatOnRightSide && state == CharacterState.Left && !ONBoat.Contains(person[0]))
+            else if (!isBoatOnRightSide && state == CharacterState.Left && !ONBoat.Contains(person))
             {
                 remainingOnCurrentBank.Add(person);
             }
@@ -281,6 +308,26 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
 
         // Check if remaining people on current bank violate the rule
         return CheckBankForViolation(remainingOnCurrentBank);
+    }
+
+    bool HasAnyBankViolation()
+    {
+        return CheckBankForViolation(GetPeopleOnBank(CharacterState.Left)) ||
+               CheckBankForViolation(GetPeopleOnBank(CharacterState.Right));
+    }
+
+    List<string> GetPeopleOnBank(CharacterState bank)
+    {
+        List<string> peopleOnBank = new List<string>();
+        string[] allPeople = { "H1", "W1", "H2", "W2", "H3", "W3" };
+
+        foreach (string person in allPeople)
+        {
+            if (GetCharacterCurrentState(person) == bank)
+                peopleOnBank.Add(person);
+        }
+
+        return peopleOnBank;
     }
 
     bool CheckBankForViolation(List<string> peopleOnBank)
@@ -372,6 +419,16 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
             ErrorMessageText.text = "";
     }
 
+    void TriggerRuleViolation(string message)
+    {
+        isGameOver = true;
+        ShowError(message);
+
+        if (ErrorSound != null) ErrorSound.Play();
+        if (GameOverPanel != null) GameOverPanel.SetActive(true);
+        if (GoButton != null) GoButton.interactable = false;
+    }
+
     void UpdateProgress()
     {
         int charactersOnLeft = 0;
@@ -386,11 +443,12 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
         if (progressSlider != null)
             progressSlider.value = charactersOnLeft / 6f;
 
-        GoButton.interactable = ONBoat.Count > 0 && !isBoatMoving;
+        if (GoButton != null)
+            GoButton.interactable = ONBoat.Count > 0 && !isBoatMoving && !isGameOver;
 
         if (charactersOnLeft == 6)
         {
-            WinState.SetActive(true);
+            if (WinState != null) WinState.SetActive(true);
             CalculateStars();
         }
     }
@@ -403,7 +461,7 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && !isBoatMoving)
+        if (Input.GetMouseButtonDown(0) && !isBoatMoving && !isGameOver)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
@@ -438,13 +496,13 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
     public void ResetGame()
     {
         SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex);
-        ButtonClick.Play();
+        if (ButtonClick != null) ButtonClick.Play();
     }
 
     public void MainMenu()
     {
         SceneManager.LoadSceneAsync(0);
-        ButtonClick.Play();
+        if (ButtonClick != null) ButtonClick.Play();
     }
 
     void CalculateStars()
@@ -456,17 +514,19 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
         if (moveCount > 15) starsEarned = 2;
         if (moveCount > 20) starsEarned = 1;
 
+        if (stars == null || nostars == null) return;
+
         for (int i = 0; i < stars.Length; i++)
         {
             if (i < starsEarned)
             {
-                stars[i].SetActive(true);
-                if (i < nostars.Length) nostars[i].SetActive(false);
+                if (stars[i] != null) stars[i].SetActive(true);
+                if (i < nostars.Length && nostars[i] != null) nostars[i].SetActive(false);
             }
             else
             {
-                stars[i].SetActive(false);
-                if (i < nostars.Length) nostars[i].SetActive(true);
+                if (stars[i] != null) stars[i].SetActive(false);
+                if (i < nostars.Length && nostars[i] != null) nostars[i].SetActive(true);
             }
         }
         starScore = starsEarned;
