@@ -94,6 +94,7 @@ public class Couple : MonoBehaviour
 
     private bool isBoatMoving = false;
     private bool isBoatOnRightSide = true;
+    private bool hasCompletedLevel = false;
     private int moveCount = 0;
 
     void Start()
@@ -435,6 +436,10 @@ public class Couple : MonoBehaviour
 
     void WinGame()
     {
+        if (hasCompletedLevel) return;
+
+        hasCompletedLevel = true;
+        LevelProgression.CompleteLevel(4);
         if (WinSound != null) WinSound.Play();
         WinState.SetActive(true);
         CalculateStars();

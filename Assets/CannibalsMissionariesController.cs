@@ -94,6 +94,7 @@ public class CannibalsMissionariesController : MonoBehaviour
 
     private bool isBoatMoving = false;
     private bool isBoatOnRightSide = true;
+    private bool hasCompletedLevel = false;
     private int moveCount = 0;
 
     void Start()
@@ -424,6 +425,10 @@ public class CannibalsMissionariesController : MonoBehaviour
 
     void WinGame()
     {
+        if (hasCompletedLevel) return;
+
+        hasCompletedLevel = true;
+        LevelProgression.CompleteLevel(3);
         if (WinSound != null) WinSound.Play();
         WinState.SetActive(true);
         CalculateStars();

@@ -68,6 +68,7 @@ public class Level1RiverController3D : MonoBehaviour
     public float boatAnimationDuration = 2.0f;
     private bool isBoatMoving = false;
     private bool isBoatOccupied = false;
+    private bool hasCompletedLevel = false;
     private Vector3 boatTargetPosition;
     private GameObject currentPassenger = null;
 
@@ -582,8 +583,17 @@ public class Level1RiverController3D : MonoBehaviour
             Vector3.Distance(Cabbage.transform.position, CabbageLeftSide.transform.position) < 0.1f &&
             Vector3.Distance(Boat.transform.position, BoatLeftSide.transform.position) < 0.1f)
         {
+            CompleteCurrentLevel();
             WinState.SetActive(true);
         }
+    }
+
+    private void CompleteCurrentLevel()
+    {
+        if (hasCompletedLevel) return;
+
+        hasCompletedLevel = true;
+        LevelProgression.CompleteLevel(currentLevel);
     }
 
     public void ResetGame()

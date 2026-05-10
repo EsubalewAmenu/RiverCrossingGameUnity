@@ -93,6 +93,7 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
 
     private bool isBoatMoving = false;
     private bool isBoatOnRightSide = true;
+    private bool hasCompletedLevel = false;
 
     // Character codes: H1=Husband1, W1=Wife1, H2=Husband2, W2=Wife2, H3=Husband3, W3=Wife3
 
@@ -390,9 +391,18 @@ public class Level4JealousHusbandsController3D : MonoBehaviour
 
         if (charactersOnLeft == 6)
         {
+            CompleteCurrentLevel();
             WinState.SetActive(true);
             CalculateStars();
         }
+    }
+
+    private void CompleteCurrentLevel()
+    {
+        if (hasCompletedLevel) return;
+
+        hasCompletedLevel = true;
+        LevelProgression.CompleteLevel(4);
     }
 
     void UpdateMoveCounter()
