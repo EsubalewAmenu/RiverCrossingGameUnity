@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainScreenScript : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class MainScreenScript : MonoBehaviour
     [SerializeField] private Button level1Button;
     [SerializeField] private Button level2Button;
     [SerializeField] private Button level3Button;
+    [SerializeField] private Button level4Button;
 
 
     [Header("Sound Buttons")]
@@ -27,11 +29,15 @@ public class MainScreenScript : MonoBehaviour
 
     private void Start()
     {
+        EnsureLevel4Button();
+
         // Navigation buttons
         quitButton.onClick.AddListener(QuitGame);
         level1Button.onClick.AddListener(Level1);
         level2Button.onClick.AddListener(Level2);
         level3Button.onClick.AddListener(Level3);
+        if (level4Button != null)
+            level4Button.onClick.AddListener(Level4);
 
 
         // Sound buttons - DIRECT APPROACH
@@ -105,6 +111,35 @@ public class MainScreenScript : MonoBehaviour
     public void Level3()
     {
         StartCoroutine(LoadSceneWithDelay(3));
+    }
+
+    public void Level4()
+    {
+        StartCoroutine(LoadSceneWithDelay(4));
+    }
+
+    private void EnsureLevel4Button()
+    {
+        if (level4Button != null || level3Button == null) return;
+
+        level4Button = Instantiate(level3Button, level3Button.transform.parent);
+        level4Button.name = "Level4Button";
+        level4Button.onClick.RemoveAllListeners();
+
+        RectTransform rectTransform = level4Button.GetComponent<RectTransform>();
+        if (rectTransform != null)
+            rectTransform.anchoredPosition += new Vector2(0f, -140f);
+
+        TMP_Text tmpText = level4Button.GetComponentInChildren<TMP_Text>();
+        if (tmpText != null)
+        {
+            tmpText.text = "Level 4";
+            return;
+        }
+
+        Text uiText = level4Button.GetComponentInChildren<Text>();
+        if (uiText != null)
+            uiText.text = "Level 4";
     }
 
 
